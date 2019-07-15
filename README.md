@@ -1,5 +1,7 @@
 # babel-plugin-transform-jsx-memo
 
+Memorize the JSX element.
+
 ## Example
 
 **In**
