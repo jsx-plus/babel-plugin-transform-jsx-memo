@@ -6,13 +6,11 @@ const helperLocalName = '__create_jsx_memo__';
 
 export default function({ types: t }) {
   const callee = t.identifier(helperLocalName);
-  let rootPath;
 
   return {
     visitor: {
       Program(path) {
-        rootPath = path;
-        path.helperImported = false;
+        path.__helperImported = false;
       },
       JSXElement: {
         exit(path) {
@@ -34,17 +32,18 @@ export default function({ types: t }) {
       JSXAttribute(path) {
         const { node } = path;
         if (t.isJSXIdentifier(node.name, { name: DIRECTIVE })) {
-          const parentJSXEl = path.findParent(path => path.isJSXElement());
+          const rootPath = path.findParent(p => p.isProgram());
+          const parentJSXEl = path.findParent(p => p.isJSXElement());
           parentJSXEl.node.__jsxmemo = true;
 
-          if (rootPath.helperImported === false) {
+          if (rootPath.__helperImported === false) {
             const imported = t.identifier(helperImportedName);
             const local = t.identifier(helperLocalName);
             const importDeclaration = t.importDeclaration([
               t.importSpecifier(local, imported)
             ], t.stringLiteral(helperImportedFrom))
             rootPath.unshiftContainer('body', importDeclaration);
-            rootPath.helperImported = true;
+            rootPath.__helperImported = true;
           }
           path.remove();
         }
