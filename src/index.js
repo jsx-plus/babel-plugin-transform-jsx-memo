@@ -1,6 +1,6 @@
 let uidCount = 0;
 const DIRECTIVE = 'x-memo';
-const helperImportedFrom = 'babel-plugin-transform-jsx-memo/lib/runtime'
+const helperImportedFrom = 'babel-runtime-jsx-plus'
 const helperImportedName = 'createJSXMemo'
 const helperLocalName = '__create_jsx_memo__';
 
@@ -17,10 +17,15 @@ export default function({types: t }) {
         if (t.isJSXIdentifier(node.name, { name: DIRECTIVE })) {
           const parentJSXEl = path.findParent(path => path.isJSXElement());
           const callee = t.identifier('__create_jsx_memo__');
-          parentJSXEl.replaceWith(t.jsxExpressionContainer(t.callExpression(callee, [
+          const replacer = t.callExpression(callee, [
             parentJSXEl.node,
             t.numericLiteral(uidCount++)
-          ])));
+          ]);
+          if (parentJSXEl.parentPath.isJSXElement()) {
+            parentJSXEl.replaceWith(t.jsxExpressionContainer(replacer));
+          } else {
+            parentJSXEl.replaceWith(replacer);
+          }
           if (helperImported === false) {
             const imported = t.identifier(helperImportedName);
             const local = t.identifier(helperLocalName);
