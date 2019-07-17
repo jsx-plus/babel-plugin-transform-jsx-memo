@@ -10,7 +10,7 @@ export default function({ types: t }) {
   return {
     visitor: {
       Program(path) {
-        path.__helperImported = false;
+        path.__memoHelperImported = false;
       },
       JSXElement: {
         exit(path) {
@@ -36,14 +36,14 @@ export default function({ types: t }) {
           const parentJSXEl = path.findParent(p => p.isJSXElement());
           parentJSXEl.node.__jsxmemo = true;
 
-          if (rootPath.__helperImported === false) {
+          if (rootPath.__memoHelperImported === false) {
             const imported = t.identifier(helperImportedName);
             const local = t.identifier(helperLocalName);
             const importDeclaration = t.importDeclaration([
               t.importSpecifier(local, imported)
             ], t.stringLiteral(helperImportedFrom))
             rootPath.unshiftContainer('body', importDeclaration);
-            rootPath.__helperImported = true;
+            rootPath.__memoHelperImported = true;
           }
           path.remove();
         }
