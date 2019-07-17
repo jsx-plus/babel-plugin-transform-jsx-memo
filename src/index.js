@@ -7,12 +7,12 @@ const helperLocalName = '__create_jsx_memo__';
 export default function({ types: t }) {
   const callee = t.identifier(helperLocalName);
   let rootPath;
-  let helperImported = false;
 
   return {
     visitor: {
       Program(path) {
         rootPath = path;
+        path.helperImported = false;
       },
       JSXElement: {
         exit(path) {
@@ -37,14 +37,14 @@ export default function({ types: t }) {
           const parentJSXEl = path.findParent(path => path.isJSXElement());
           parentJSXEl.node.__jsxmemo = true;
 
-          if (helperImported === false) {
+          if (rootPath.helperImported === false) {
             const imported = t.identifier(helperImportedName);
             const local = t.identifier(helperLocalName);
             const importDeclaration = t.importDeclaration([
               t.importSpecifier(local, imported)
             ], t.stringLiteral(helperImportedFrom))
-            rootPath.node.body.unshift(importDeclaration);
-            helperImported = true;
+            rootPath.unshiftContainer('body', importDeclaration);
+            rootPath.helperImported = true;
           }
           path.remove();
         }
