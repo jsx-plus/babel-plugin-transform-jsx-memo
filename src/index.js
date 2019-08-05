@@ -18,7 +18,7 @@ export default function({ types: t }) {
           if (node.__jsxmemo) {
             node.__jsxmemo = false;
             const replacer = t.callExpression(callee, [
-              node,
+              t.arrowFunctionExpression([], node),
               t.numericLiteral(uidCount++)
             ]);
             if (parentPath.isJSXElement()) {

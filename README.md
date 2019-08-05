@@ -31,7 +31,7 @@ export default function Foo(props) {
   } = props;
   return <div>
       Demo:
-      {__create_jsx_memo__(<p>hello {message}</p>, 0)}
+      {__create_jsx_memo__(() => <p>hello {message}</p>, 0)}
     </div>;
 }
 
