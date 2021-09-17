@@ -7,8 +7,8 @@ export default function Foo(props) {
   return __create_jsx_memo__(() => <View className="page-home">
       <Header>
         <Image source={source} className="home-logo" />
-        {__create_jsx_memo__(() => <Text className="home-title" onClick={handleClick}>Welcome to {message}</Text>, 0)}
+        {__create_jsx_memo__(() => <Text className="home-title" onClick={handleClick}>Welcome to {message}</Text>, "df0155a@0")}
       </Header>
       <View className="home-intro"><Text>To get started, edit and rebuild.</Text></View>
-    </View>, 1);
+    </View>, "df0155a@1");
 }

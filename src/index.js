@@ -1,15 +1,11 @@
-let uidCount = 0;
+import crc32 from './crc32';
+
 const DIRECTIVE = 'x-memo';
 const helperImportedFrom = 'babel-runtime-jsx-plus'
 const helperImportedName = 'createJSXMemo'
 const helperLocalName = '__create_jsx_memo__';
 
-export default function({ types: t, cache }) {
-  // Never cache the file, for uid may duplicated.
-  // https://github.com/jsx-plus/babel-plugin-transform-jsx-memo/issues/3
-  // https://babeljs.io/docs/en/config-files#apicache
-  cache.never();
-
+export default function({ types: t }) {
   const callee = t.identifier(helperLocalName);
 
   return {
@@ -18,13 +14,13 @@ export default function({ types: t, cache }) {
         path.__memoHelperImported = false;
       },
       JSXElement: {
-        exit(path) {
+        exit(path, state) {
           const { node, parentPath } = path;
           if (node.__jsxmemo) {
             node.__jsxmemo = false;
             const replacer = t.callExpression(callee, [
               t.arrowFunctionExpression([], node),
-              t.numericLiteral(uidCount++)
+              t.stringLiteral(getUniqueIdentifier(state))
             ]);
             if (parentPath.isJSXElement()) {
               path.replaceWith(t.jsxExpressionContainer(replacer));
@@ -55,4 +51,11 @@ export default function({ types: t, cache }) {
       }
     }
   };
+}
+
+// Generate unique identifier, avoid id conflicts.
+// https://github.com/jsx-plus/babel-plugin-transform-jsx-memo/issues/3
+let uidCount = 0;
+function getUniqueIdentifier(state) {
+  return crc32(state.filename) + '@' + uidCount++;
 }
