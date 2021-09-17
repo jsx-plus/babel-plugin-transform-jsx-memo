@@ -4,7 +4,12 @@ const helperImportedFrom = 'babel-runtime-jsx-plus'
 const helperImportedName = 'createJSXMemo'
 const helperLocalName = '__create_jsx_memo__';
 
-export default function({ types: t }) {
+export default function({ types: t, cache }) {
+  // Never cache the file, for uid may duplicated.
+  // https://github.com/jsx-plus/babel-plugin-transform-jsx-memo/issues/3
+  // https://babeljs.io/docs/en/config-files#apicache
+  cache.never();
+
   const callee = t.identifier(helperLocalName);
 
   return {
