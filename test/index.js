@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import assert from 'assert';
-import { transformFileSync } from '@babel/core';
+import { transformSync } from '@babel/core';
 import plugin from '../src';
 
 function trim(str) {
@@ -14,11 +14,14 @@ describe('', () => {
     it(`should ${caseName.split('-').join(' ')}`, () => {
       const fixtureDir = path.join(fixturesDir, caseName);
       const actualPath = path.join(fixtureDir, 'actual.js');
-      const actual = transformFileSync(actualPath, {
+
+      const rawInput = fs.readFileSync(actualPath, 'utf-8');
+      const actual = transformSync(rawInput, {
         plugins: [[plugin, {}]],
         parserOpts: {
           plugins: ['jsx']
         },
+        filename: '/fake/path/to/file',
       }).code;
 
       const expected = fs.readFileSync(
